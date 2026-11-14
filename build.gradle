@@ -52,20 +52,13 @@ repositories {
     }
 
     maven {
-        name = 'GeckoLib'
-        url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+        name = 'CurseMaven'
+        url = 'https://www.cursemaven.com'
     }
 
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = 'Modrinth'
-                url = 'https://api.modrinth.com/maven'
-            }
-        }
-        filter {
-            includeGroup('maven.modrinth')
-        }
+    maven {
+        name = 'GeckoLib'
+        url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
     }
 
     mavenCentral()
@@ -75,7 +68,7 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
     // Emotecraft 2.2.7-b.build.50 para Forge 1.20.1. Es una dependencia obligatoria.
-    implementation fg.deobf('maven.modrinth:pZ2wrerK:2f5mEUPY')
+    implementation fg.deobf('curse.maven:emotecraft-forge-403422:4632460')
 
     // Emotecraft utiliza PlayerAnimator para ejecutar las animaciones por keyframes.
     implementation fg.deobf("dev.kosmx.player-anim:player-animation-lib-forge:${player_anim_version}")
