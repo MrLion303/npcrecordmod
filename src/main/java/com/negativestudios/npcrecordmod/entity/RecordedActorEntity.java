@@ -40,7 +40,7 @@ public class RecordedActorEntity extends PathfinderMob {
         super(type, level);
         setNoAi(true);
         setNoGravity(true);
-        setNoPhysics(true);
+        this.noPhysics = true;
         setPersistenceRequired();
     }
 
@@ -131,7 +131,7 @@ public class RecordedActorEntity extends PathfinderMob {
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag tag) {
+    public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.putString("ActorName", getActorName());
         tag.putString("SkinUrl", getSkinUrl());
@@ -144,7 +144,7 @@ public class RecordedActorEntity extends PathfinderMob {
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag tag) {
+    public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         setActorName(tag.getString("ActorName"));
         setSkinUrl(tag.getString("SkinUrl"));
