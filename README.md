@@ -1,8 +1,14 @@
 # NPC Record Mod
 
-Mod de Forge 1.20.1 para grabar actuaciones de jugadores y reproducirlas como actores NPC durante eventos en vivo, con un flujo de trabajo inspirado en los eventos de Fortnite.
+Mod de Forge 1.20.1 para grabar los movimientos y las acciones de un único personaje y reproducir esa actuación como un NPC independiente durante eventos en vivo, con un flujo de trabajo inspirado en los personajes controlados de los eventos de Fortnite.
 
-La prioridad es preparar una actuación una vez y ejecutarla con un comando durante un evento. El servidor controla el tiempo y el movimiento de los actores; los clientes reciben la actuación para verla sincronizada.
+## Concepto principal
+
+**Una grabación representa a un solo personaje NPC.** No es una escena cinematográfica ni un conjunto de personajes. Es la actuación completa de ese personaje: dónde camina, cuándo corre, hacia dónde mira, qué acciones hace y en qué momentos reproduce emotes.
+
+El flujo es sencillo: grabas una actuación, la guardas y luego creas un NPC que la reproduce. La apariencia del NPC se configura por separado, de modo que puedes cambiar su skin o modelo sin volver a grabar sus movimientos.
+
+El servidor controla el tiempo y el desplazamiento del personaje. Los clientes reciben los datos necesarios para mostrar la misma actuación sincronizada.
 
 ## Entorno objetivo
 
@@ -27,15 +33,15 @@ Por tanto:
 - La grabación contiene los datos de animación necesarios para reproducir ese emote mediante PlayerAnimator.
 - No se guarda solamente un nombre o UUID que obligue a cada cliente a buscar el emote en su carpeta.
 
-Esto permite compartir una misma actuación con los jugadores del evento aunque no tengan descargado el paquete de emotes original.
+Esto permite que el personaje reproduzca su actuación aunque los espectadores no tengan descargado el paquete de emotes original.
 
-## Cómo se graba una actuación
+## Cómo se graba un personaje
 
 1. Un operador inicia la grabación con `/npcrecord record start llegada_agente`.
-2. El jugador actúa normalmente: camina, corre, salta, gira, se agacha y reproduce emotes.
+2. El jugador actúa como el personaje: camina, corre, salta, gira, se agacha y reproduce emotes.
 3. El servidor registra posición, orientación, velocidad y estados de movimiento en cada tick.
 4. Cuando Emotecraft inicia o detiene un emote, el cliente del jugador que graba envía al servidor los datos de keyframes y su marca temporal.
-5. Al detener la grabación, los datos quedan guardados como un JSON dentro del mundo.
+5. Al detener la grabación, la actuación de ese único personaje se guarda como un JSON dentro del mundo.
 
 Para capturar los emotes, el jugador que actúa necesita Emotecraft 2.2.7-b.build.50. Los clientes espectadores no necesitan los archivos originales de los emotes.
 
@@ -43,7 +49,7 @@ Para capturar los emotes, el jugador que actúa necesita Emotecraft 2.2.7-b.buil
 
 Todos los comandos requieren OP nivel 2.
 
-### Grabación
+### Grabar la actuación de un personaje
 
 ```mcfunction
 /npcrecord record start <nombre>
@@ -56,17 +62,17 @@ Ejemplo:
 
 ```mcfunction
 /npcrecord record start llegada_agente
-# Actúa dentro del juego...
+# Actúa como el personaje...
 /npcrecord record stop
 ```
 
-Las grabaciones se guardan en:
+Cada archivo contiene la actuación de un único personaje y se guarda en:
 
 ```text
 <carpeta-del-mundo>/npcrecord/recordings/<nombre>.json
 ```
 
-### Reproducir una grabación
+### Crear el NPC y reproducir su actuación
 
 ```mcfunction
 /npcrecord play <grabacion>
@@ -79,7 +85,7 @@ Ejemplo:
 /npcrecord play llegada_agente AgenteJones
 ```
 
-El actor aparece donde se ejecuta el comando. La trayectoria se reproduce de forma relativa a ese punto, para reutilizar la misma actuación en distintas zonas del mapa.
+Este comando crea un único NPC que reproduce la actuación guardada. El personaje aparece donde se ejecuta el comando y recorre la trayectoria registrada de forma relativa a ese punto, por lo que puedes reutilizar la misma actuación en otra ubicación del mapa.
 
 ### Asignar una skin desde un enlace
 
@@ -94,18 +100,18 @@ Ejemplo:
 /npcrecord skin set AgenteJones "https://i.imgur.com/ejemplo.png"
 ```
 
-El enlace debe apuntar directamente a una imagen de skin compatible, no a una página de galería o publicación. Se aceptan imágenes PNG/JPG de 64x64 o 64x32. Los clientes que renderizan al actor descargan la textura HTTPS y la guardan en caché local.
+El enlace debe apuntar directamente a una imagen de skin compatible, no a una página de galería o publicación. Se aceptan imágenes PNG/JPG de 64x64 o 64x32. Los clientes que renderizan al NPC descargan la textura HTTPS y la guardan en caché local.
 
 Usa enlaces directos como `i.imgur.com`. Un enlace a una página de Imgur como `imgur.com/a/...` no es una textura directa.
 
 ## Diseño para eventos en vivo
 
-- Las posiciones y el reloj de reproducción se controlan desde el servidor.
-- Las grabaciones no dependen de que el jugador que las creó permanezca conectado.
+- Cada grabación contiene un solo personaje.
+- El NPC reproduce la actuación sin depender de que el jugador que la grabó permanezca conectado.
+- El servidor controla la línea de tiempo y el desplazamiento del NPC.
 - Los espectadores no necesitan el archivo individual de los emotes grabados.
-- La apariencia del actor se asigna por separado de la actuación.
-- Una misma grabación se puede reproducir varias veces y desde distintas ubicaciones.
-- La línea temporal de emotes se envía a cada cliente cuando empieza a seguir al actor.
+- La skin y, más adelante, el modelo del NPC se pueden cambiar sin volver a grabar la actuación.
+- La línea temporal de emotes se envía a cada cliente cuando empieza a seguir al NPC.
 
 ## Estado del desarrollo
 
@@ -115,7 +121,7 @@ La base inicial ya incluye:
 - Emotecraft 2.2.7-b.build.50 y PlayerAnimator como dependencias obligatorias.
 - Grabación de movimiento y orientación desde el servidor.
 - Captura de eventos de Emotecraft y serialización de sus keyframes dentro del JSON.
-- Sincronización de la línea temporal de emotes con los clientes que ven al actor.
+- Sincronización de la línea temporal de emotes con los clientes que ven al NPC.
 - Entidad NPC que reproduce la trayectoria y aplica los keyframes de PlayerAnimator al modelo humanoide.
 - Comandos iniciales para grabar, reproducir, listar y asignar skins por URL.
 - Compilación verificada mediante GitHub Actions.
@@ -123,11 +129,10 @@ La base inicial ya incluye:
 Antes de utilizarlo en eventos reales faltan pruebas y trabajo en:
 
 - Pruebas en servidor dedicado con Emotecraft 2.2.7-b.build.50 y varios espectadores, incluida la verificación visual de todos los emotes.
-- Interpolación y sincronización fina para movimientos fluidos durante escenas largas.
+- Interpolación y sincronización fina para desplazamientos fluidos durante actuaciones largas.
 - Transiciones configurables entre caminar, correr, idle y emotes.
 - Modelos y animaciones personalizados de Blockbench mediante GeckoLib.
-- Escenas con varios actores y control coordinado de reproducción.
-- Editor visual para revisar, organizar y recortar actuaciones.
+- Herramientas para revisar, organizar, recortar y ajustar la actuación individual del NPC.
 
 La compilación correcta no sustituye las pruebas dentro del juego. El mod sigue en desarrollo y no se considera una versión terminada ni un lanzamiento.
 
@@ -135,7 +140,7 @@ La compilación correcta no sustituye las pruebas dentro del juego. El mod sigue
 
 El workflow **Compilar mod** se ejecuta al hacer push a `main`, al abrir un pull request o manualmente desde GitHub Actions. Usa Java 17 y Gradle 8.8 y publica el JAR como artefacto de Actions.
 
-La compilación del commit actual terminó correctamente. El artefacto se llama `npcrecordmod-forge-1.20.1` y está disponible en la ejecución de GitHub Actions. El workflow no crea Releases de GitHub.
+La compilación del commit que inicializó el proyecto terminó correctamente. El artefacto se llama `npcrecordmod-forge-1.20.1` y está disponible en la ejecución de GitHub Actions. El workflow no crea Releases de GitHub.
 
 Para compilar localmente con Gradle 8.8:
 
