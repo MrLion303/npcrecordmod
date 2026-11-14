@@ -1,0 +1,12 @@
+.gradle/
+.gradle-cache/
+build/
+out/
+run/
+runs/
+*.iml
+.idea/
+.settings/
+.classpath
+.project
+.DS_Store
